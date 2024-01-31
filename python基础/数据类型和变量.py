@@ -95,17 +95,17 @@ print('------------')
 # 空值是Python里一个特殊的值，用None表示。None不能理解为0，因为0是有意义的，而None是一个特殊的空值。
 print(None)
 
-print(0 is not None)
+print(0 is not None)#True
 
-print('' is not None)
+print('' is not None) #True
 
-print('' is None)
+print('' is None) #False
 
-print(0 is None)
+print(0 is None) #False
 
-print(0 == None)
+print(0 == None) #False
 
-print('' != None)
+print('' != None) #True
 
 # 变量
 # 变量的概念基本上和初中代数的方程变量是一致的，只是在计算机程序中，变量不仅可以是数字，还可以是任意数据类型。

@@ -58,3 +58,4 @@ elif trim('    ') != '':
     print('测试失败!')
 else:
     print('测试成功!')
+
