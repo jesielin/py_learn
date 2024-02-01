@@ -49,6 +49,82 @@ def count():
 
 f1, f2, f3 = count()
 
-print(f1())
-print(f2())
-print(f3())
+print(f1()) #9
+print(f2()) #9
+print(f3()) #9
+# 全部都是9！原因就在于返回的函数引用了变量i，但它并非立刻执行。等到3个函数都返回时，它们所引用的变量i已经变成了3，因此最终结果为9。
+
+# 返回闭包时牢记一点：返回函数不要引用任何循环变量，或者后续会发生变化的变量。!!!
+
+# 如果一定要引用循环变量怎么办？方法是再创建一个函数，用该函数的参数绑定循环变量当前的值，无论该循环变量后续如何更改，已绑定到函数参数的值不变：
+def count():
+    def f(i):
+        def g():
+            return i*i
+        return g
+    fs = []
+    for i in range(1,4):
+        fs.append(f(i))
+    return fs
+f1,f2,f3 = count()
+print(f1()) #1
+print(f2()) #4
+print(f3()) #9
+# 缺点是代码较长，可利用lambda函数缩短代码。
+def count():
+    def f(i):
+        return lambda :i*i
+
+    fs = []
+    for i in range(1, 4):
+        fs.append(f(i))
+    return fs
+f1,f2,f3 = count()
+print(f1()) #1
+print(f2()) #4
+print(f3()) #9
+
+#nonlocal
+# 使用闭包，就是内层函数引用了外层函数的局部变量。如果只是读外层变量的值，我们会发现返回的闭包函数调用一切正常：
+# 但是，如果对外层变量赋值，由于Python解释器会把x当作函数fn()的局部变量，它会报错：
+# 原因是x作为局部变量并没有初始化，直接计算x+1是不行的。
+# 但我们其实是想引用inc()函数内部的x，
+# 所以需要在fn()函数内部加一个nonlocal x的声明。
+# 加上这个声明后，解释器把fn()的x看作外层函数的局部变量，它已经被初始化了，可以正确计算x+1。
+
+def inc():
+    x = 0
+    def f():
+        # nonlocal x
+        # x = x +1
+        return x+1
+    return f
+f = inc()
+print(f())
+# 使用闭包时，对外层变量赋值前，需要先使用nonlocal声明该变量不是当前函数的局部变量。！！！
+
+# 练习
+# 利用闭包返回一个计数器函数，每次调用它返回递增整数：
+def createCounter():
+    x = 0
+    def counter():
+        nonlocal x
+        x += 1
+        return x
+    return counter
+
+
+# 测试:
+counterA = createCounter()
+print(counterA(), counterA(), counterA(), counterA(), counterA())  # 1 2 3 4 5
+counterB = createCounter()
+if [counterB(), counterB(), counterB(), counterB()] == [1, 2, 3, 4]:
+    print('测试通过!')
+else:
+    print('测试失败!')
+'''
+小结
+一个函数可以返回一个计算结果，也可以返回一个函数。
+
+返回一个函数时，牢记该函数并未执行，返回函数中不要引用任何可能会变化的变量。
+'''
